@@ -39,3 +39,46 @@ Ensure your GitHub repository is configured to deploy from GitHub Actions:
 3. Under **Build and deployment**, set the **Source** to **GitHub Actions**.
 
 Once configured, pushing code to the `main` branch will seamlessly update your live website!
+
+## How to Fork and Host Your Own Version
+
+If you want to create your own copy of this project and host it on your personal GitHub Pages, follow these steps from scratch:
+
+1. **Fork the Repository**: 
+   Click the **Fork** button at the top right corner of this repository's page to create a copy in your own GitHub account.
+
+2. **Clone the Repository**:
+   Clone your newly forked repository to your local machine:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Github_Page_CI-CD.git
+   cd Github_Page_CI-CD
+   ```
+
+3. **Enable GitHub Actions (if prompted)**:
+   Go to the **Actions** tab in your newly forked repository and click **"I understand my workflows, go ahead and enable them"** if prompted.
+
+4. **Configure GitHub Pages**:
+   - Go to your repository **Settings**.
+   - Navigate to **Pages** on the left sidebar.
+   - Under **Build and deployment**, set the **Source** dropdown to **GitHub Actions**.
+
+5. **Make Local Changes and Push**:
+   Open the cloned repository in VSCode (or your favorite editor) and make your changes:
+   ```bash
+   code .
+   ```
+   When you're ready to deploy your changes, commit and push them to the `main` branch. This push will automatically trigger the GitHub Action to build and deploy your site!
+   ```bash
+   git add .
+   git commit -m "Your descriptive commit message"
+   git push -u origin main
+   ```
+
+6. **View Your Live Site**:
+   Wait a couple of minutes for the GitHub Action workflow to complete. Once finished, you can find your live URL at the top of the **Settings > Pages** screen, or right there in the Actions summary!
+
+### Manual Deployment (Optional)
+If you don't want to make local changes right away but still want to see the live site, you can trigger the deployment manually:
+- Go to the **Actions** tab.
+- Click on the **Deploy to GitHub Pages** workflow on the left.
+- Click the **Run workflow** button on the right, and then click the green **Run workflow** button.
