@@ -1,62 +1,82 @@
+# Workflow: the whole automation pipeline for this repo.
+# Name shown in the GitHub Actions tab.
 name: Deploy Next.js to GitHub Pages
 
+# When this workflow should run (its triggers).
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: ["main"]   # runs automatically on every push to main
+  workflow_dispatch:      # also allows manually running it from the Actions tab
 
+# Permissions granted to the built-in GITHUB_TOKEN for this workflow.
+# (No custom Secrets are used here - this is GitHub's own automatic auth.)
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read   # read the repo code
+  pages: write     # allow publishing to GitHub Pages
+  id-token: write  # allow OIDC token for secure Pages deployment
 
+# Prevents overlapping deployments - only one "pages" deployment runs at a time.
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
+# Jobs: the independent units of work in this workflow.
+# Each job runs on its own fresh runner (VM) unless it "needs" another job.
 jobs:
+  # Job 1: test - runs the test suite before anything gets built/deployed.
   test:
     runs-on: ubuntu-latest
     steps:
+      # Step: pull the repo's code onto the runner
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Step: install Node.js on the runner (with npm cache for speed)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
 
+      # Step: install all npm dependencies
       - name: Install dependencies
         run: npm install
 
+      # Step: run the Jest test suite (npm test) - fails the job if any test fails
       - name: Run tests
         run: npm test
 
+  # Job 2: build - only runs if "test" job succeeds (needs: test)
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      # Step: pull the repo's code onto the runner
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Step: install Node.js on the runner (with npm cache for speed)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
 
+      # Step: install all npm dependencies
       - name: Install dependencies
         run: npm install
 
+      # Step: build the Next.js app into static files (outputs to ./out)
       - name: Build
         run: npm run build
 
+      # Step: package the ./out folder as an Artifact so the deploy job can use it
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
+  # Job 3: deploy - only runs if "build" job succeeds (needs: build)
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -64,6 +84,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Step: take the Artifact uploaded in the build job and publish it to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
